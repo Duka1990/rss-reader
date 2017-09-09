@@ -1,35 +1,34 @@
 package hu.possible.demo.rssreader.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import hu.possible.demo.rssreader.R;
-import hu.possible.demo.rssreader.adapters.RssSourceListAdapter;
+import hu.possible.demo.rssreader.adapters.RssFeedListAdapter;
 import hu.possible.demo.rssreader.models.ContentState;
-import hu.possible.demo.rssreader.models.RssSource;
-import hu.possible.demo.rssreader.utils.ModelHelpers;
-import hu.possible.demo.rssreader.utils.StringUtils;
+import hu.possible.demo.rssreader.models.Feed;
+import hu.possible.demo.rssreader.models.Item;
 import hu.possible.demo.rssreader.utils.ui.RegularSpacerItemDecoration;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 
-public class MainActivity extends AbstractActivity {
+public class FeedActivity extends AbstractActivity {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// CONSTANTS
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static final String PARAM_RSS_SOURCE_ID = "rssSourceId";
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// CONSTANTS - - END
@@ -38,13 +37,36 @@ public class MainActivity extends AbstractActivity {
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// CONSTRUCTION
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static Intent newIntent(Context context, String rssSourceId) {
+        Intent intent = new Intent(context, FeedActivity.class);
+
+        intent.putExtra(PARAM_RSS_SOURCE_ID, rssSourceId);
+
+        return intent;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// CONSTRUCTION - - END
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// FIELDS
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    @BindView(R.id.rss_sources_list_recyclerView)
+    @BindView(R.id.rss_feed_list_recyclerView)
     RecyclerView mRecyclerView;
 
-    RssSourceListAdapter mRssSourceListAdapter;
+    @BindView(R.id.rss_feed_list_progressBar)
+    ProgressBar mProgressBar;
+
+    private String mRssSourceId;
+
+    RssFeedListAdapter mRssFeedListAdapter;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// FIELDS - - END
@@ -60,34 +82,36 @@ public class MainActivity extends AbstractActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
+        mRssSourceId = getIntent().getStringExtra(PARAM_RSS_SOURCE_ID);
+
+        setContentView(R.layout.activity_feed);
 
         ButterKnife.bind(this);
 
-        setupToolbar(false, true, true, false, true);
+        setupToolbar(true, false, false, true, true);
 
-        mRssSourceListAdapter = new RssSourceListAdapter(this);
+        mRssFeedListAdapter = new RssFeedListAdapter(this);
 
-        int spacing = (int) getResources().getDimension(R.dimen.rss_source_list_recyclerView_spacing);
-        int firstRowSpacing = (int) getResources().getDimension(R.dimen.rss_source_list_recyclerView_firstRowSpacing);
-        int lastRowSpacing = (int) getResources().getDimension(R.dimen.rss_source_list_recyclerView_lastRowSpacing);
+        int spacing = (int) getResources().getDimension(R.dimen.rss_feed_list_recyclerView_spacing);
+        int firstRowSpacing = (int) getResources().getDimension(R.dimen.rss_feed_list_recyclerView_firstRowSpacing);
+        int lastRowSpacing = (int) getResources().getDimension(R.dimen.rss_feed_list_recyclerView_lastRowSpacing);
 
         mRecyclerView.addItemDecoration(new RegularSpacerItemDecoration(1, firstRowSpacing, lastRowSpacing, spacing, true));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setAdapter(mRssSourceListAdapter);
+        mRecyclerView.setAdapter(mRssFeedListAdapter);
 
-        mRssSourceListAdapter.getOnClickObservable()
+        mRssFeedListAdapter.getOnClickObservable()
                 .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<RssSource>() {
+                .subscribe(new Observer<Item>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                     }
 
                     @Override
-                    public void onNext(@NonNull RssSource rssSource) {
-                        Intent intent = FeedActivity.newIntent(MainActivity.this, rssSource.getId());
-
-                        startActivity(intent);
+                    public void onNext(@NonNull Item item) {
+                        Snackbar
+                                .make(getRootContentView(), item.getLink(), Snackbar.LENGTH_SHORT)
+                                .show();
                     }
 
                     @Override
@@ -99,22 +123,16 @@ public class MainActivity extends AbstractActivity {
                     }
                 });
 
-        mRssSourceListAdapter.getOnShareObservable()
+        mRssFeedListAdapter.getOnRemoveObservable()
                 .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<RssSource>() {
+                .subscribe(new Observer<Item>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                     }
 
                     @Override
-                    public void onNext(@NonNull RssSource rssSource) {
-                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-
-                        shareIntent.putExtra(Intent.EXTRA_SUBJECT, ModelHelpers.resolveTitleFromRssSource(rssSource));
-                        shareIntent.putExtra(Intent.EXTRA_TEXT, rssSource.getUrl());
-                        shareIntent.setType("text/plain");
-
-                        startActivity(Intent.createChooser(shareIntent, getString(R.string.dialog_shareRssSource_title)));
+                    public void onNext(@NonNull Item item) {
+                        mContentManager.removeFeedItem(item);
                     }
 
                     @Override
@@ -126,28 +144,10 @@ public class MainActivity extends AbstractActivity {
                     }
                 });
 
-        mRssSourceListAdapter.getOnRemoveObservable()
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<RssSource>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-                    }
+        mRecyclerView.setVisibility(View.GONE);
+        mProgressBar.setVisibility(View.VISIBLE);
 
-                    @Override
-                    public void onNext(@NonNull RssSource rssSource) {
-                        mContentManager.removeRssSource(rssSource);
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                    }
-
-                    @Override
-                    public void onComplete() {
-                    }
-                });
-
-        mContentManager.loadRssSources();
+        mContentManager.loadFeedInRssSource(mRssSourceId, false);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -168,14 +168,23 @@ public class MainActivity extends AbstractActivity {
     protected void onContentStateChanged(ContentState contentState) {
         switch (contentState) {
             case LOADING:
+                mRecyclerView.setVisibility(View.GONE);
+                mProgressBar.setVisibility(View.VISIBLE);
                 break;
             case READY:
+                mRecyclerView.setVisibility(View.VISIBLE);
+                mProgressBar.setVisibility(View.GONE);
+
                 displayContent();
                 break;
             case EMPTY:
+                mProgressBar.setVisibility(View.GONE);
+
                 clearContent();
                 break;
             case ERROR:
+                mProgressBar.setVisibility(View.GONE);
+
                 break;
             default:
                 break;
@@ -197,8 +206,8 @@ public class MainActivity extends AbstractActivity {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    protected void onAddSelected() {
-        showAddRssSourceDialog();
+    protected void onRefreshSelected() {
+        mContentManager.loadFeedInRssSource(mRssSourceId, true);
     }
 
     @Override
@@ -214,39 +223,6 @@ public class MainActivity extends AbstractActivity {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// DIALOG SUPPORT - - END
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void showAddRssSourceDialog() {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_add_rss_source, null);
-
-        final EditText editText = dialogView.findViewById(R.id.dialog_addRssSource_input);
-
-        dialogBuilder.setView(dialogView);
-        dialogBuilder.setTitle(R.string.dialog_addRssSource_title);
-        dialogBuilder.setPositiveButton(R.string.dialog_addRssSource_add, (dialog, whichButton) -> {
-            String input = editText.getText().toString();
-
-            if (TextUtils.isEmpty(input)) {
-                Snackbar
-                        .make(getRootContentView(), R.string.dialog_addRssSource_empty, Snackbar.LENGTH_SHORT)
-                        .show();
-            } else if (!StringUtils.isValidUrl(input)) {
-                Snackbar
-                        .make(getRootContentView(), R.string.dialog_addRssSource_invalid_url, Snackbar.LENGTH_SHORT)
-                        .show();
-            } else {
-                mContentManager.addNewRssSource(input);
-            }
-        });
-
-        dialogBuilder.setNegativeButton(R.string.dialog_addRssSource_cancel, (dialog, whichButton) -> {
-        });
-
-        AlertDialog alertDialog = dialogBuilder.create();
-
-        alertDialog.show();
-    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// DIALOG SUPPORT - - END
@@ -273,13 +249,19 @@ public class MainActivity extends AbstractActivity {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void clearContent() {
-        mRssSourceListAdapter.clearItemsIfAny();
-        mRssSourceListAdapter.notifyDataSetChanged();
+        mRssFeedListAdapter.clearItemsIfAny();
+        mRssFeedListAdapter.notifyDataSetChanged();
     }
 
     private void displayContent() {
-        mRssSourceListAdapter.replaceItems(mContentManager.getRssSources());
-        mRssSourceListAdapter.notifyDataSetChanged();
+        Feed feed = mContentManager.getFeedFromRssSource(mRssSourceId);
+
+        if (feed == null) {
+            return;
+        }
+
+        mRssFeedListAdapter.replaceItems(feed.getChannel().getItems());
+        mRssFeedListAdapter.notifyDataSetChanged();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

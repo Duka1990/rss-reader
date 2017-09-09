@@ -63,8 +63,6 @@ public abstract class AbstractActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         injectActivity();
-
-        mContentManager.initializeRssSources();
     }
 
     @Override
@@ -207,7 +205,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
      * Sets up the app bar ({@link android.widget.Toolbar}).
      */
     protected void setupToolbar(
-            boolean displayHomeAsUpEnabled, boolean displayNavigationLogo, boolean displayAdd, boolean displayRefresh, boolean displaySort) {
+            boolean displayHomeAsUpEnabled, boolean displayShowHomeEnabled, boolean displayAdd, boolean displayRefresh, boolean displaySort) {
         mDisplayAdd = displayAdd;
         mDisplayRefresh = displayRefresh;
         mDisplaySort = displaySort;
@@ -216,16 +214,16 @@ public abstract class AbstractActivity extends AppCompatActivity {
 
         setSupportActionBar(toolBar);
 
-        updateToolbar(displayHomeAsUpEnabled, displayNavigationLogo);
+        updateToolbar(displayHomeAsUpEnabled, displayShowHomeEnabled);
     }
 
     /**
      * Updates the app bar ({@link android.widget.Toolbar}).
      */
-    protected void updateToolbar(boolean displayHomeAsUpEnabled, boolean displayNavigationLogo) {
+    protected void updateToolbar(boolean displayHomeAsUpEnabled, boolean displayShowHomeEnabled) {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(displayHomeAsUpEnabled);
-            getSupportActionBar().setDisplayShowHomeEnabled(displayNavigationLogo);
+            getSupportActionBar().setDisplayShowHomeEnabled(displayShowHomeEnabled);
         }
     }
 

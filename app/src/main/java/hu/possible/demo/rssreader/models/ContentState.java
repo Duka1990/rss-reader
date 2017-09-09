@@ -8,8 +8,6 @@ public enum ContentState {
 
     EMPTY,
 
-    ERROR,
-
-    ERROR_DB;
+    ERROR
 
 }

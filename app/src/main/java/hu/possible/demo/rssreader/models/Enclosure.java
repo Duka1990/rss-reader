@@ -1,10 +1,9 @@
 package hu.possible.demo.rssreader.models;
 
+import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
-import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
-import io.realm.RealmList;
 import io.realm.RealmObject;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,32 +12,27 @@ import lombok.experimental.Accessors;
 
 @NoArgsConstructor
 @Accessors(prefix = "m")
-@Root(name = "channel", strict = false)
-public class Channel extends RealmObject {
+@Root(name = "enclosure", strict = false)
+public class Enclosure extends RealmObject {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// FIELDS
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    @Element(name = "title")
+    @Attribute(name = "url")
     @Getter
     @Setter
-    private String mTitle;
+    private String mUrl;
 
-    @Element(name = "link")
+    @Attribute(name = "length", required = false)
     @Getter
     @Setter
-    private String mLink;
+    private String mLength;
 
-    @Element(name = "description", required = false)
+    @Attribute(name = "type")
     @Getter
     @Setter
-    private String mDescription;
-
-    @ElementList(name = "item", inline = true)
-    @Getter
-    @Setter
-    private RealmList<Item> mItems;
+    private String mType;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// FIELDS

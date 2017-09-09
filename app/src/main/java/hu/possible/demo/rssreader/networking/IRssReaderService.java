@@ -1,6 +1,6 @@
 package hu.possible.demo.rssreader.networking;
 
-import hu.possible.demo.rssreader.models.RssFeed;
+import hu.possible.demo.rssreader.models.Feed;
 import io.reactivex.Observable;
 import retrofit2.Response;
 import retrofit2.http.GET;
@@ -13,7 +13,7 @@ interface IRssReaderService {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @GET
-    Observable<Response<RssFeed>> getRssFeed(@Url String url);
+    Observable<Response<Feed>> getFeed(@Url String url);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// ACQUIRE API STATUS - - END

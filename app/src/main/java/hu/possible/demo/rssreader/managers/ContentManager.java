@@ -3,7 +3,8 @@ package hu.possible.demo.rssreader.managers;
 import java.util.List;
 
 import hu.possible.demo.rssreader.models.ContentState;
-import hu.possible.demo.rssreader.models.RssFeed;
+import hu.possible.demo.rssreader.models.Feed;
+import hu.possible.demo.rssreader.models.Item;
 import hu.possible.demo.rssreader.models.RssSource;
 import hu.possible.demo.rssreader.models.StateObject;
 import hu.possible.demo.rssreader.models.StateObject.State;
@@ -56,41 +57,6 @@ public class ContentManager {
     /// NETWORK OPERATIONS
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// NETWORK OPERATIONS - - EMD
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public void getRssFeed(String url) {
-        mRssReaderClient.getRssFeed(url)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<RssFeed>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-                    }
-
-                    @Override
-                    public void onNext(@NonNull RssFeed rssFeed) {
-                        //mRssSources = new StateObject<>(StateObject.State.OK, rssFeed);
-
-                        mContentStatusSubject.onNext(mRssSources.getState().equals(State.OK) ? ContentState.READY : ContentState.EMPTY);
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        mContentStatusSubject.onNext(ContentState.ERROR);
-                    }
-
-                    @Override
-                    public void onComplete() {
-                    }
-                });
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// MANAGER EVENTS
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     public Observable<ContentState> getContentStatusObservable() {
         return mContentStatusSubject;
     }
@@ -99,12 +65,24 @@ public class ContentManager {
     /// MANAGER EVENTS - - END
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// DATA OPERATIONS
+    /// OPERATIONS
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public List<RssSource> getRssSources() {
         return mRssSources.get();
+    }
+
+    public Feed getFeedFromRssSource(String rssSourceId) {
+        for (RssSource rssSource : mRssSources.get()) {
+            if (rssSource.getId().equals(rssSourceId)) {
+                return rssSource.getFeed();
+            }
+        }
+
+        return null;
     }
 
     public void addNewRssSource(String url) {
@@ -131,14 +109,14 @@ public class ContentManager {
                     public void onError(@NonNull Throwable e) {
                         Timber.d("addNewRssSource -> onError");
 
-                        mContentStatusSubject.onNext(ContentState.ERROR_DB);
+                        mContentStatusSubject.onNext(ContentState.ERROR);
                     }
 
                     @Override
                     public void onComplete() {
                         Timber.d("addNewRssSource -> onComplete");
 
-                        initializeRssSources();
+                        loadRssSources();
                     }
                 });
     }
@@ -163,19 +141,19 @@ public class ContentManager {
                     public void onError(@NonNull Throwable e) {
                         Timber.d("removeRssSource -> onError");
 
-                        mContentStatusSubject.onNext(ContentState.ERROR_DB);
+                        mContentStatusSubject.onNext(ContentState.ERROR);
                     }
 
                     @Override
                     public void onComplete() {
                         Timber.d("removeRssSource -> onComplete");
 
-                        initializeRssSources();
+                        loadRssSources();
                     }
                 });
     }
 
-    public void initializeRssSources() {
+    public void loadRssSources() {
         mContentStatusSubject.onNext(ContentState.LOADING);
 
         mDatabaseManager.getRssSources()
@@ -183,12 +161,12 @@ public class ContentManager {
                 .subscribe(new Observer<StateObject<List<RssSource>>>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
-                        Timber.d("initializeRssSources -> onSubscribe");
+                        Timber.d("loadRssSources -> onSubscribe");
                     }
 
                     @Override
                     public void onNext(@NonNull StateObject<List<RssSource>> rssSources) {
-                        Timber.d("initializeRssSources -> onNext");
+                        Timber.d("loadRssSources -> onNext");
 
                         mRssSources = rssSources;
 
@@ -197,20 +175,140 @@ public class ContentManager {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        Timber.d("initializeRssSources -> onError");
+                        Timber.d("loadRssSources -> onError");
 
-                        mContentStatusSubject.onNext(ContentState.ERROR_DB);
+                        mContentStatusSubject.onNext(ContentState.ERROR);
                     }
 
                     @Override
                     public void onComplete() {
-                        Timber.d("initializeRssSources -> onComplete");
+                        Timber.d("loadRssSources -> onComplete");
+                    }
+                });
+    }
+
+    public void loadFeedInRssSource(String rssSourceId, boolean forceReload) {
+        mContentStatusSubject.onNext(ContentState.LOADING);
+
+        mDatabaseManager.getRssSource(rssSourceId)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<RssSource>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        Timber.d("getRssSource -> onSubscribe");
+                    }
+
+                    @Override
+                    public void onNext(@NonNull RssSource rssSource) {
+                        Timber.d("getRssSource -> onNext");
+
+                        if (forceReload || rssSource.getFeed() == null) {
+                            mRssReaderClient.getFeed(rssSource.getUrl())
+                                    .subscribeOn(Schedulers.newThread())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(new Observer<Feed>() {
+                                        @Override
+                                        public void onSubscribe(@NonNull Disposable d) {
+                                        }
+
+                                        @Override
+                                        public void onNext(@NonNull Feed feed) {
+                                            addFeedToRssSource(rssSourceId, feed);
+                                        }
+
+                                        @Override
+                                        public void onError(@NonNull Throwable e) {
+                                            mContentStatusSubject.onNext(ContentState.ERROR);
+                                        }
+
+                                        @Override
+                                        public void onComplete() {
+                                        }
+                                    });
+                        } else {
+                            mContentStatusSubject.onNext(ContentState.READY);
+                        }
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Timber.d("getRssSource -> onError");
+
+                        mContentStatusSubject.onNext(ContentState.ERROR);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Timber.d("getRssSource -> onComplete");
+                    }
+                });
+    }
+
+    private void addFeedToRssSource(String rssSourceId, Feed feed) {
+        mDatabaseManager.insertNewFeedIntoRssSource(rssSourceId, feed)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Object>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        Timber.d("addFeedToRssSource -> onSubscribe");
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Object o) {
+                        Timber.d("addFeedToRssSource -> onNext");
+
+                        loadRssSources();
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Timber.d("addFeedToRssSource -> onError");
+
+                        mContentStatusSubject.onNext(ContentState.ERROR);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Timber.d("addFeedToRssSource -> onComplete");
+                    }
+                });
+
+    }
+
+    public void removeFeedItem(Item item) {
+        mContentStatusSubject.onNext(ContentState.LOADING);
+
+        mDatabaseManager.removeFeedItem(item)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Object>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        Timber.d("removeFeedItem -> onSubscribe");
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Object object) {
+                        Timber.d("removeFeedItem -> onNext");
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Timber.d("removeFeedItem -> onError");
+
+                        mContentStatusSubject.onNext(ContentState.ERROR);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Timber.d("removeFeedItem -> onComplete");
+
+                        loadRssSources();
                     }
                 });
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// DATA OPERATIONS - - END
+    /// OPERATIONS - - END
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
