@@ -18,15 +18,15 @@ public class RssSourceListViewHolder extends ViewHolder {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Getter
-    @BindView(R.id.rss_source_list_item_title)
+    @BindView(R.id.rssSourceList_item_title)
     TextView mTitle;
 
     @Getter
-    @BindView(R.id.rss_source_list_item_description)
+    @BindView(R.id.rssSourceList_item_description)
     TextView mDescription;
 
     @Getter
-    @BindView(R.id.rss_source_list_item_menu)
+    @BindView(R.id.rssSourceList_item_menu)
     TextView mMenu;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

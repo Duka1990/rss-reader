@@ -2,16 +2,19 @@ package hu.possible.demo.rssreader.activities;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import javax.inject.Inject;
 
 import hu.possible.demo.rssreader.R;
 import hu.possible.demo.rssreader.application.MyApplication;
 import hu.possible.demo.rssreader.managers.ContentManager;
+import hu.possible.demo.rssreader.models.ContentOrderMode;
 import hu.possible.demo.rssreader.models.ContentState;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
@@ -26,6 +29,16 @@ public abstract class AbstractActivity extends AppCompatActivity {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// CONSTANTS
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    enum ContentOrderPermission {
+
+        ORDER_BY_TITLE,
+
+        ORDER_BY_PUB_DATE,
+
+        NONE
+
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// CONSTANTS - - END
@@ -46,7 +59,9 @@ public abstract class AbstractActivity extends AppCompatActivity {
 
     private boolean mDisplayRefresh;
 
-    private boolean mDisplaySort;
+    private boolean mDisplayOpenInBrowser;
+
+    private boolean mDisplayShare;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// FIELDS - - END
@@ -90,11 +105,41 @@ public abstract class AbstractActivity extends AppCompatActivity {
 
         MenuItem addItem = menu.findItem(R.id.toolbar_action_add);
         MenuItem refreshItem = menu.findItem(R.id.toolbar_action_refresh);
-        MenuItem sortItem = menu.findItem(R.id.toolbar_action_sort);
+        MenuItem openInBrowserItem = menu.findItem(R.id.toolbar_action_open_in_browser);
+        MenuItem orderItem = menu.findItem(R.id.toolbar_action_order);
+        MenuItem orderByAZItem = menu.findItem(R.id.toolbar_action_order_az);
+        MenuItem orderByZAItem = menu.findItem(R.id.toolbar_action_order_za);
+        MenuItem orderByNewestFirstItem = menu.findItem(R.id.toolbar_action_order_newest_first);
+        MenuItem orderByOldestFirstItem = menu.findItem(R.id.toolbar_action_order_oldest_first);
+        MenuItem shareItem = menu.findItem(R.id.toolbar_action_share);
 
         addItem.setVisible(mDisplayAdd);
         refreshItem.setVisible(mDisplayRefresh);
-        sortItem.setVisible(mDisplaySort);
+        openInBrowserItem.setVisible(mDisplayOpenInBrowser);
+
+        switch (getContentOrderPermission()) {
+            case ORDER_BY_TITLE:
+                orderItem.setVisible(true);
+                orderByAZItem.setVisible(true);
+                orderByZAItem.setVisible(true);
+                orderByNewestFirstItem.setVisible(false);
+                orderByOldestFirstItem.setVisible(false);
+                break;
+            case ORDER_BY_PUB_DATE:
+                orderItem.setVisible(true);
+                orderByAZItem.setVisible(false);
+                orderByZAItem.setVisible(false);
+                orderByNewestFirstItem.setVisible(true);
+                orderByOldestFirstItem.setVisible(true);
+                break;
+            case NONE:
+                orderItem.setVisible(false);
+                break;
+            default:
+                throw new UnsupportedOperationException();
+        }
+
+        shareItem.setVisible(mDisplayShare);
 
         return true;
     }
@@ -113,8 +158,31 @@ public abstract class AbstractActivity extends AppCompatActivity {
             case R.id.toolbar_action_refresh:
                 onRefreshSelected();
                 return true;
-            case R.id.toolbar_action_sort:
-                onSortSelected();
+            case R.id.toolbar_action_open_in_browser:
+                onOpenInBrowserSelected();
+                return true;
+            case R.id.toolbar_action_order_az:
+                item.setChecked(true);
+                onOrderSelected(ContentOrderMode.ORDER_BY_TITLE_ASC);
+                return true;
+            case R.id.toolbar_action_order_za:
+                item.setChecked(true);
+                onOrderSelected(ContentOrderMode.ORDER_BY_TITLE_DESC);
+                return true;
+            case R.id.toolbar_action_order_newest_first:
+                item.setChecked(true);
+                onOrderSelected(ContentOrderMode.ORDER_BY_PUB_DATE_ASC);
+                return true;
+            case R.id.toolbar_action_order_oldest_first:
+                item.setChecked(true);
+                onOrderSelected(ContentOrderMode.ORDER_BY_PUB_DATE_DESC);
+                return true;
+            case R.id.toolbar_action_order_default:
+                item.setChecked(true);
+                onOrderSelected(ContentOrderMode.DEFAULT);
+                return true;
+            case R.id.toolbar_action_share:
+                onShareSelected();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -205,10 +273,12 @@ public abstract class AbstractActivity extends AppCompatActivity {
      * Sets up the app bar ({@link android.widget.Toolbar}).
      */
     protected void setupToolbar(
-            boolean displayHomeAsUpEnabled, boolean displayShowHomeEnabled, boolean displayAdd, boolean displayRefresh, boolean displaySort) {
+            boolean displayHomeAsUpEnabled, boolean displayShowHomeEnabled, boolean displayAdd,
+            boolean displayRefresh, boolean displayOpenInBrowser, boolean displayShare) {
         mDisplayAdd = displayAdd;
         mDisplayRefresh = displayRefresh;
-        mDisplaySort = displaySort;
+        mDisplayOpenInBrowser = displayOpenInBrowser;
+        mDisplayShare = displayShare;
 
         Toolbar toolBar = findViewById(R.id.toolbar);
 
@@ -225,6 +295,10 @@ public abstract class AbstractActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(displayHomeAsUpEnabled);
             getSupportActionBar().setDisplayShowHomeEnabled(displayShowHomeEnabled);
         }
+    }
+
+    protected ContentOrderPermission getContentOrderPermission () {
+        return ContentOrderPermission.NONE;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -247,7 +321,13 @@ public abstract class AbstractActivity extends AppCompatActivity {
     protected void onRefreshSelected() {
     }
 
-    protected void onSortSelected() {
+    protected void onOpenInBrowserSelected() {
+    }
+
+    protected void onOrderSelected(ContentOrderMode contentOrderMode) {
+    }
+
+    protected void onShareSelected() {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -256,6 +336,43 @@ public abstract class AbstractActivity extends AppCompatActivity {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// TOOLBAR SUPPORT - - END
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// DIALOG SUPPORT - - END
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    protected void showGeneralErrorDialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+
+        dialogBuilder.setMessage(R.string.dialog_generalError_description);
+
+        dialogBuilder.setPositiveButton(R.string.dialog_generalError_ok, (dialog, whichButton) -> {
+        });
+
+        AlertDialog alertDialog = dialogBuilder.create();
+
+        alertDialog.show();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// DIALOG SUPPORT - - END
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// SNACK BAR SUPPORT
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    protected View getRootContentView() {
+        return findViewById(android.R.id.content);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// SNACK BAR SUPPORT - - END
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }

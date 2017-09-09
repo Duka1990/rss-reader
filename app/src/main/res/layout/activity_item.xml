@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="hu.possible.demo.rssreader.activities.ItemActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay"/>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/appBar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/itemActivity_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/itemActivity_title_paddingTop"
+                android:paddingBottom="@dimen/itemActivity_title_paddingBottom"
+                android:paddingStart="@dimen/itemActivity_title_paddingStart"
+                android:paddingEnd="@dimen/itemActivity_title_paddingEnd"
+                android:textAppearance="?android:textAppearanceLarge"/>
+
+            <TextView
+                android:id="@+id/itemActivity_pubDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/itemActivity_pubDate_paddingBottom"
+                android:paddingStart="@dimen/itemActivity_pubDate_paddingStart"
+                android:paddingEnd="@dimen/itemActivity_pubDate_paddingEnd"
+                android:textAppearance="?android:textAppearance"/>
+
+            <ImageView
+                android:id="@+id/itemActivity_image"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/itemActivity_image_height"
+                android:layout_marginStart="@dimen/itemActivity_image_marginStart"
+                android:layout_marginEnd="@dimen/itemActivity_image_marginEnd"
+                android:layout_marginBottom="@dimen/itemActivity_image_marginBottom"
+                android:contentDescription="@string/imageView_defaultContentDescription"/>
+
+            <TextView
+                android:id="@+id/itemActivity_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/itemActivity_description_paddingBottom"
+                android:paddingStart="@dimen/itemActivity_description_paddingStart"
+                android:paddingEnd="@dimen/itemActivity_description_paddingEnd"
+                android:autoLink="web"
+                android:textAppearance="?android:textAppearance"/>
+
+        <LinearLayout
+            android:id="@+id/itemActivity_relatedMedia_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/itemActivity_relatedMedia_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/itemActivity_relatedMedia_label_paddingBottom"
+                android:paddingStart="@dimen/itemActivity_relatedMedia_label_paddingStart"
+                android:paddingEnd="@dimen/itemActivity_relatedMedia_label_paddingEnd"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:text="@string/itemActivity_relatedMedia_label"/>
+
+            <TextView
+                android:id="@+id/itemActivity_relatedMedia_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/itemActivity_relatedMedia_content_paddingBottom"
+                android:paddingStart="@dimen/itemActivity_relatedMedia_content_paddingStart"
+                android:paddingEnd="@dimen/itemActivity_relatedMedia_content_paddingEnd"
+                android:autoLink="web"
+                android:textAppearance="?android:textAppearance"/>
+
+        </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

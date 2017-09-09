@@ -2,11 +2,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/rss_source_list_item_share"
-        android:title="@string/rss_source_list_item_action_share"/>
+        android:id="@+id/rssSourceList_item_share"
+        android:title="@string/rssSourceList_item_action_share"/>
 
     <item
-        android:id="@+id/rss_source_list_item_remove"
-        android:title="@string/rss_source_list_item_action_remove"/>
+        android:id="@+id/rssSourceList_item_remove"
+        android:title="@string/rssSourceList_item_action_remove"/>
 
 </menu>

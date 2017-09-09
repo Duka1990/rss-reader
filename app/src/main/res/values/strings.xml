@@ -1,19 +1,49 @@
 <resources>
+
+    <!-- COMMON -->
+
     <string name="app_name">RSSReader</string>
     <string name="imageView_defaultContentDescription">image</string>
 
     <string name="toolbar_action_add">Add</string>
     <string name="toolbar_action_refresh">Refresh</string>
-    <string name="toolbar_action_sort">Sort</string>
+    <string name="toolbar_action_open_in_browser">Open in browser</string>
+    <string name="toolbar_action_share">Share</string>
+    <string name="toolbar_action_order">Order</string>
+    <string name="toolbar_action_order_az">Order A->Z</string>
+    <string name="toolbar_action_order_za">Order Z->A</string>
+    <string name="toolbar_action_order_newest_first">Newest first</string>
+    <string name="toolbar_action_order_oldest_first">Oldest first</string>
+    <string name="toolbar_action_order_default">Default</string>
 
-    <string name="rss_source_list_item_menu">&#8942;</string>
-    <string name="rss_source_list_item_action_share">Share</string>
-    <string name="rss_source_list_item_action_remove">Remove</string>
+    <!-- MAIN ACTIVITY -->
 
-    <string name="rss_feed_list_item_menu">&#8942;</string>
-    <string name="rss_feed_list_item_action_remove">Remove</string>
+    <string name="rssSourceList_item_menu">&#8942;</string>
+    <string name="rssSourceList_item_action_share">Share</string>
+    <string name="rssSourceList_item_action_remove">Remove</string>
 
-    <string name="dialog_shareRssSource_title">Share RSS source</string>
+    <!-- FEED ACTIVITY -->
+
+    <string name="rssFeedList_item_menu">&#8942;</string>
+    <string name="rssFeedList_item_action_share">Share</string>
+    <string name="rssFeedList_item_action_remove">Remove</string>
+
+    <!-- ITEM ACTIVITY -->
+
+    <string name="itemActivity_relatedMedia_label">Related media content</string>
+    <string name="itemActivity_no_link_to_open">The article is still loading or there is no link to open.</string>
+    <string name="itemActivity_cannot_open_in_browser">The article cannot be opened.</string>
+    <string name="itemActivity_no_link_share">The article is still loading or there is no link to share.</string>
+
+    <!-- DIALOGS -->
+
+    <string name="dialog_generalError_description">Something went wrong.</string>
+    <string name="dialog_generalError_ok">OK</string>
+
+    <string name="dialog_feedError_description">Something went wrong. Check your internet connection or the feed that you\'re trying to open.</string>
+    <string name="dialog_feedError_ok">OK</string>
+
+    <string name="dialog_share_title">Share</string>
 
     <string name="dialog_addRssSource_title">Add RSS source</string>
     <string name="dialog_addRssSource_add">Add</string>

@@ -1,44 +1,78 @@
 <resources>
 
-    <dimen name="rss_source_list_recyclerView_spacing">0dp</dimen>
-    <dimen name="rss_source_list_recyclerView_firstRowSpacing">8dp</dimen>
-    <dimen name="rss_source_list_recyclerView_lastRowSpacing">8dp</dimen>
+    <!-- MAIN ACTIVITY -->
 
-    <dimen name="rss_source_list_item_height">72dp</dimen>
+    <dimen name="rssSourceList_recyclerView_spacing">0dp</dimen>
+    <dimen name="rssSourceList_recyclerView_firstRowSpacing">8dp</dimen>
+    <dimen name="rssSourceList_recyclerView_lastRowSpacing">8dp</dimen>
 
-    <dimen name="rss_source_list_item_title_paddingTop">16dp</dimen>
-    <dimen name="rss_source_list_item_title_paddingStart">16dp</dimen>
-    <dimen name="rss_source_list_item_title_paddingEnd">16dp</dimen>
+    <dimen name="rssSourceList_item_height">72dp</dimen>
 
-    <dimen name="rss_source_list_item_description_paddingStart">16dp</dimen>
-    <dimen name="rss_source_list_item_description_paddingEnd">16dp</dimen>
+    <dimen name="rssSourceList_item_title_paddingTop">16dp</dimen>
+    <dimen name="rssSourceList_item_title_paddingStart">16dp</dimen>
+    <dimen name="rssSourceList_item_title_paddingEnd">16dp</dimen>
 
-    <dimen name="rss_source_list_item_menu_width">32dp</dimen>
-    <dimen name="rss_source_list_item_menu_height">32dp</dimen>
-    <dimen name="rss_source_list_item_menu_marginEnd">16dp</dimen>
+    <dimen name="rssSourceList_item_description_paddingStart">16dp</dimen>
+    <dimen name="rssSourceList_item_description_paddingEnd">16dp</dimen>
 
-    <dimen name="rss_feed_list_recyclerView_spacing">0dp</dimen>
-    <dimen name="rss_feed_list_recyclerView_firstRowSpacing">8dp</dimen>
-    <dimen name="rss_feed_list_recyclerView_lastRowSpacing">8dp</dimen>
+    <dimen name="rssSourceList_item_menu_width">32dp</dimen>
+    <dimen name="rssSourceList_item_menu_height">32dp</dimen>
+    <dimen name="rssSourceList_item_menu_marginEnd">16dp</dimen>
 
-    <dimen name="rss_feed_list_item_height">88dp</dimen>
+    <!-- FEED ACTIVITY -->
 
-    <dimen name="rss_feed_list_item_image_marginTop">20dp</dimen>
-    <dimen name="rss_feed_list_item_image_marginStart">16dp</dimen>
+    <dimen name="feedActivity_rssFeedList_recyclerView_spacing">0dp</dimen>
+    <dimen name="feedActivity_rssFeedList_recyclerView_firstRowSpacing">8dp</dimen>
+    <dimen name="feedActivity_rssFeedList_recyclerView_lastRowSpacing">8dp</dimen>
 
-    <dimen name="rss_feed_list_item_title_paddingTop">20dp</dimen>
-    <dimen name="rss_feed_list_item_title_paddingStart">72dp</dimen>
-    <dimen name="rss_feed_list_item_title_paddingEnd">16dp</dimen>
+    <dimen name="rssFeedList_item_height">88dp</dimen>
 
-    <dimen name="rss_feed_list_item_description_paddingStart">72dp</dimen>
-    <dimen name="rss_feed_list_item_description_paddingEnd">16dp</dimen>
+    <dimen name="rssFeedList_item_image_marginTop">20dp</dimen>
+    <dimen name="rssFeedList_item_image_marginStart">16dp</dimen>
 
-    <dimen name="rss_feed_list_item_pubDate_paddingStart">72dp</dimen>
-    <dimen name="rss_feed_list_item_pubDate_paddingEnd">16dp</dimen>
+    <dimen name="rssFeedList_item_title_paddingTop">20dp</dimen>
+    <dimen name="rssFeedList_item_title_paddingStart">72dp</dimen>
+    <dimen name="rssFeedList_item_title_paddingEnd">16dp</dimen>
 
-    <dimen name="rss_feed_list_item_menu_width">32dp</dimen>
-    <dimen name="rss_feed_list_item_menu_height">32dp</dimen>
-    <dimen name="rss_feed_list_item_menu_marginEnd">16dp</dimen>
+    <dimen name="rssFeedList_item_description_paddingStart">72dp</dimen>
+    <dimen name="rssFeedList_item_description_paddingEnd">16dp</dimen>
+
+    <dimen name="rssFeedList_item_pubDate_paddingStart">72dp</dimen>
+    <dimen name="rssFeedList_item_pubDate_paddingEnd">16dp</dimen>
+
+    <dimen name="rssFeedList_item_menu_width">32dp</dimen>
+    <dimen name="rssFeedList_item_menu_height">32dp</dimen>
+    <dimen name="rssFeedList_item_menu_marginEnd">16dp</dimen>
+
+    <!-- ITEM ACTIVITY -->
+
+    <dimen name="itemActivity_title_paddingTop">20dp</dimen>
+    <dimen name="itemActivity_title_paddingBottom">20dp</dimen>
+    <dimen name="itemActivity_title_paddingStart">16dp</dimen>
+    <dimen name="itemActivity_title_paddingEnd">16dp</dimen>
+    
+    <dimen name="itemActivity_pubDate_paddingBottom">20dp</dimen>
+    <dimen name="itemActivity_pubDate_paddingStart">16dp</dimen>
+    <dimen name="itemActivity_pubDate_paddingEnd">16dp</dimen>
+
+    <dimen name="itemActivity_image_height">214dp</dimen>
+    <dimen name="itemActivity_image_marginStart">16dp</dimen>
+    <dimen name="itemActivity_image_marginEnd">16dp</dimen>
+    <dimen name="itemActivity_image_marginBottom">20dp</dimen>
+
+    <dimen name="itemActivity_description_paddingBottom">20dp</dimen>
+    <dimen name="itemActivity_description_paddingStart">16dp</dimen>
+    <dimen name="itemActivity_description_paddingEnd">16dp</dimen>
+
+    <dimen name="itemActivity_relatedMedia_label_paddingBottom">20dp</dimen>
+    <dimen name="itemActivity_relatedMedia_label_paddingStart">16dp</dimen>
+    <dimen name="itemActivity_relatedMedia_label_paddingEnd">16dp</dimen>
+
+    <dimen name="itemActivity_relatedMedia_content_paddingBottom">20dp</dimen>
+    <dimen name="itemActivity_relatedMedia_content_paddingStart">16dp</dimen>
+    <dimen name="itemActivity_relatedMedia_content_paddingEnd">16dp</dimen>
+
+    <!-- DIALOGS -->
 
     <dimen name="dialog_addRssSource_input_paddingStart">24dp</dimen>
     <dimen name="dialog_addRssSource_input_paddingEnd">24dp</dimen>

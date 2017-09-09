@@ -1,18 +1,20 @@
 package hu.possible.demo.rssreader.adapters;
 
-import android.content.Context;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import hu.possible.demo.rssreader.R;
 import hu.possible.demo.rssreader.adapters.viewholders.RssSourceListViewHolder;
+import hu.possible.demo.rssreader.models.ContentOrderMode;
 import hu.possible.demo.rssreader.models.RssSource;
 import hu.possible.demo.rssreader.utils.ModelHelpers;
 import io.reactivex.Observable;
@@ -24,9 +26,10 @@ public class RssSourceListAdapter extends RecyclerView.Adapter<ViewHolder> {
     /// FIELDS
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private Context mContext;
-
+    private List<RssSource> mUnorderedItems = new ArrayList<>();
     private List<RssSource> mItems = new ArrayList<>();
+
+    private ContentOrderMode mContentOrderMode = ContentOrderMode.DEFAULT;
 
     private final PublishSubject<RssSource> mOnClickSubject = PublishSubject.create();
     private final PublishSubject<RssSource> mOnShareSubject = PublishSubject.create();
@@ -42,8 +45,7 @@ public class RssSourceListAdapter extends RecyclerView.Adapter<ViewHolder> {
     /// CONSTRUCTION
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public RssSourceListAdapter(Context context) {
-        mContext = context;
+    public RssSourceListAdapter() {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,10 +98,10 @@ public class RssSourceListAdapter extends RecyclerView.Adapter<ViewHolder> {
         popup.getMenuInflater().inflate(R.menu.rss_source_list_item_actions, popup.getMenu());
         popup.setOnMenuItemClickListener(menuItem -> {
             switch (menuItem.getItemId()) {
-                case R.id.rss_source_list_item_share:
+                case R.id.rssSourceList_item_share:
                     mOnShareSubject.onNext(rssSource);
                     break;
-                case R.id.rss_source_list_item_remove:
+                case R.id.rssSourceList_item_remove:
                     mOnRemoveSubject.onNext(rssSource);
                     break;
                 default:
@@ -116,31 +118,6 @@ public class RssSourceListAdapter extends RecyclerView.Adapter<ViewHolder> {
     /// HELPER METHODS
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private RssSource getItemForPosition(int position) {
-        return mItems.get(position);
-    }
-
-    public void addItems(List<RssSource> items) {
-        mItems.addAll(items);
-    }
-
-    public void clearItemsIfAny() {
-        if (isEmpty()) {
-            return;
-        }
-
-        mItems.clear();
-    }
-
-    public void replaceItems(List<RssSource> items) {
-        clearItemsIfAny();
-        addItems(items);
-    }
-
-    public boolean isEmpty() {
-        return mItems.isEmpty();
-    }
-
     public Observable<RssSource> getOnClickObservable(){
         return mOnClickSubject;
     }
@@ -151,6 +128,69 @@ public class RssSourceListAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     public Observable<RssSource> getOnRemoveObservable(){
         return mOnRemoveSubject;
+    }
+
+    private RssSource getItemForPosition(int position) {
+        return mItems.get(position);
+    }
+
+    public void addItems(List<RssSource> items) {
+        clearItemsIfAny();
+        mUnorderedItems.addAll(items);
+        mItems.addAll(items);
+
+        if (mContentOrderMode != ContentOrderMode.DEFAULT) {
+            orderItems(mContentOrderMode);
+        }
+    }
+
+    public void clearItemsIfAny() {
+        if (mItems.isEmpty()) {
+            return;
+        }
+
+        mUnorderedItems.clear();
+        mItems.clear();
+    }
+
+    public void orderItems(ContentOrderMode contentOrderMode) {
+        mContentOrderMode = contentOrderMode;
+
+        switch (contentOrderMode) {
+            case ORDER_BY_TITLE_ASC:
+                orderItemsByTitle(true);
+                break;
+            case ORDER_BY_TITLE_DESC:
+                orderItemsByTitle(false);
+                break;
+            case ORDER_BY_PUB_DATE_ASC:
+                throw new UnsupportedOperationException();
+            case ORDER_BY_PUB_DATE_DESC:
+                throw new UnsupportedOperationException();
+            case DEFAULT:
+                mItems.clear();
+                mItems.addAll(mUnorderedItems);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void orderItemsByTitle(boolean ascending) {
+        Collections.sort(mItems, (first, second) -> {
+            String firstTitle = ModelHelpers.resolveTitleFromRssSource(first);
+            String secondTitle = ModelHelpers.resolveTitleFromRssSource(second);
+
+            if (TextUtils.isEmpty(firstTitle) || TextUtils.isEmpty(secondTitle)) {
+                return 0;
+            }
+
+            if (ascending) {
+                return firstTitle.toLowerCase().compareTo(secondTitle.toLowerCase());
+            } else {
+                return secondTitle.toLowerCase().compareTo(firstTitle.toLowerCase());
+            }
+        });
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

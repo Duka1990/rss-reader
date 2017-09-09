@@ -1,7 +1,6 @@
 package hu.possible.demo.rssreader.models;
 
 import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
 import io.realm.RealmObject;

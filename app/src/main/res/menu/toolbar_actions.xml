@@ -16,13 +16,56 @@
         android:icon="@drawable/toolbar_refresh"
         android:orderInCategory="2"
         android:title="@string/toolbar_action_refresh"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/toolbar_action_open_in_browser"
+        android:icon="@drawable/toolbar_open_in_browser"
+        android:orderInCategory="3"
+        android:title="@string/toolbar_action_open_in_browser"
         app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/toolbar_action_sort"
-        android:icon="@drawable/toolbar_sort"
-        android:orderInCategory="3"
-        android:title="@string/toolbar_action_sort"
+        android:id="@+id/toolbar_action_order"
+        android:icon="@drawable/toolbar_order"
+        android:orderInCategory="4"
+        android:title="@string/toolbar_action_order"
+        app:showAsAction="ifRoom">
+
+        <menu>
+            <group
+                android:id="@+id/exclusive_checkable_group"
+                android:checkableBehavior="single">
+                <item
+                    android:id="@+id/toolbar_action_order_az"
+                    android:title="@string/toolbar_action_order_az"/>
+
+                <item
+                    android:id="@+id/toolbar_action_order_za"
+                    android:title="@string/toolbar_action_order_za"/>
+
+                <item
+                    android:id="@+id/toolbar_action_order_newest_first"
+                    android:title="@string/toolbar_action_order_newest_first"/>
+
+                <item
+                    android:id="@+id/toolbar_action_order_oldest_first"
+                    android:title="@string/toolbar_action_order_oldest_first"/>
+
+                <item
+                    android:id="@+id/toolbar_action_order_default"
+                    android:title="@string/toolbar_action_order_default"
+                    android:checked="true"/>
+            </group>
+        </menu>
+
+    </item>
+
+    <item
+        android:id="@+id/toolbar_action_share"
+        android:icon="@drawable/toolbar_share"
+        android:orderInCategory="5"
+        android:title="@string/toolbar_action_share"
         app:showAsAction="ifRoom"/>
 
 </menu>

@@ -3,7 +3,7 @@ package hu.possible.demo.rssreader.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -13,9 +13,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import hu.possible.demo.rssreader.R;
 import hu.possible.demo.rssreader.adapters.RssFeedListAdapter;
+import hu.possible.demo.rssreader.models.ContentOrderMode;
 import hu.possible.demo.rssreader.models.ContentState;
-import hu.possible.demo.rssreader.models.Feed;
 import hu.possible.demo.rssreader.models.Item;
+import hu.possible.demo.rssreader.models.RssSource;
+import hu.possible.demo.rssreader.utils.AndroidUtils;
+import hu.possible.demo.rssreader.utils.ModelHelpers;
 import hu.possible.demo.rssreader.utils.ui.RegularSpacerItemDecoration;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -58,15 +61,17 @@ public class FeedActivity extends AbstractActivity {
     /// FIELDS
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    @BindView(R.id.rss_feed_list_recyclerView)
+    @BindView(R.id.feedActivity_rssFeedList_recyclerView)
     RecyclerView mRecyclerView;
 
-    @BindView(R.id.rss_feed_list_progressBar)
+    @BindView(R.id.feedActivity_rssFeedList_progressBar)
     ProgressBar mProgressBar;
 
     private String mRssSourceId;
 
-    RssFeedListAdapter mRssFeedListAdapter;
+    private RssSource mRssSource;
+
+    private RssFeedListAdapter mRssFeedListAdapter;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// FIELDS - - END
@@ -88,13 +93,13 @@ public class FeedActivity extends AbstractActivity {
 
         ButterKnife.bind(this);
 
-        setupToolbar(true, false, false, true, true);
+        setupToolbar(true, false, false, true, false, true);
 
         mRssFeedListAdapter = new RssFeedListAdapter(this);
 
-        int spacing = (int) getResources().getDimension(R.dimen.rss_feed_list_recyclerView_spacing);
-        int firstRowSpacing = (int) getResources().getDimension(R.dimen.rss_feed_list_recyclerView_firstRowSpacing);
-        int lastRowSpacing = (int) getResources().getDimension(R.dimen.rss_feed_list_recyclerView_lastRowSpacing);
+        int spacing = (int) getResources().getDimension(R.dimen.feedActivity_rssFeedList_recyclerView_spacing);
+        int firstRowSpacing = (int) getResources().getDimension(R.dimen.feedActivity_rssFeedList_recyclerView_firstRowSpacing);
+        int lastRowSpacing = (int) getResources().getDimension(R.dimen.feedActivity_rssFeedList_recyclerView_lastRowSpacing);
 
         mRecyclerView.addItemDecoration(new RegularSpacerItemDecoration(1, firstRowSpacing, lastRowSpacing, spacing, true));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -109,9 +114,30 @@ public class FeedActivity extends AbstractActivity {
 
                     @Override
                     public void onNext(@NonNull Item item) {
-                        Snackbar
-                                .make(getRootContentView(), item.getLink(), Snackbar.LENGTH_SHORT)
-                                .show();
+                        Intent intent = ItemActivity.newIntent(FeedActivity.this, mRssSourceId, item.getId());
+
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+
+        mRssFeedListAdapter.getOnShareObservable()
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Item>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Item item) {
+                        AndroidUtils.share(FeedActivity.this, ModelHelpers.resolveTitleFromItem(item), item.getLink());
                     }
 
                     @Override
@@ -185,6 +211,7 @@ public class FeedActivity extends AbstractActivity {
             case ERROR:
                 mProgressBar.setVisibility(View.GONE);
 
+                showFeedErrorDialog();
                 break;
             default:
                 break;
@@ -206,12 +233,24 @@ public class FeedActivity extends AbstractActivity {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
+    protected ContentOrderPermission getContentOrderPermission () {
+        return ContentOrderPermission.ORDER_BY_PUB_DATE;
+    }
+
+    @Override
     protected void onRefreshSelected() {
         mContentManager.loadFeedInRssSource(mRssSourceId, true);
     }
 
     @Override
-    protected void onSortSelected() {
+    protected void onOrderSelected(ContentOrderMode contentOrderMode) {
+        mRssFeedListAdapter.orderItems(contentOrderMode);
+        mRssFeedListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onShareSelected() {
+        AndroidUtils.share(FeedActivity.this, ModelHelpers.resolveTitleFromRssSource(mRssSource), mRssSource.getUrl());
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -224,22 +263,20 @@ public class FeedActivity extends AbstractActivity {
     /// DIALOG SUPPORT - - END
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// DIALOG SUPPORT - - END
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    protected void showFeedErrorDialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 
+        dialogBuilder.setMessage(R.string.dialog_feedError_description);
+        dialogBuilder.setPositiveButton(R.string.dialog_feedError_ok, (dialog, whichButton) -> {
+        });
 
+        AlertDialog alertDialog = dialogBuilder.create();
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// SNACK BAR SUPPORT
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public View getRootContentView() {
-        return findViewById(android.R.id.content);
+        alertDialog.show();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// SNACK BAR SUPPORT - - END
+    /// DIALOG SUPPORT - - END
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -254,13 +291,13 @@ public class FeedActivity extends AbstractActivity {
     }
 
     private void displayContent() {
-        Feed feed = mContentManager.getFeedFromRssSource(mRssSourceId);
+        mRssSource = mContentManager.getRssSource(mRssSourceId);
 
-        if (feed == null) {
+        if (mRssSource.getFeed() == null) {
             return;
         }
 
-        mRssFeedListAdapter.replaceItems(feed.getChannel().getItems());
+        mRssFeedListAdapter.addItems(mRssSource.getFeed().getChannel().getItems());
         mRssFeedListAdapter.notifyDataSetChanged();
     }
 

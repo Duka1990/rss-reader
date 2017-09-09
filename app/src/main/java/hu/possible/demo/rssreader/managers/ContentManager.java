@@ -75,10 +75,28 @@ public class ContentManager {
         return mRssSources.get();
     }
 
-    public Feed getFeedFromRssSource(String rssSourceId) {
+    public RssSource getRssSource(String rssSourceId) {
         for (RssSource rssSource : mRssSources.get()) {
             if (rssSource.getId().equals(rssSourceId)) {
-                return rssSource.getFeed();
+                return rssSource;
+            }
+        }
+
+        return null;
+    }
+
+    public Item getItemFromRssSource(String rssSourceId, String itemId) {
+        for (RssSource rssSource : mRssSources.get()) {
+            if (rssSource.getId().equals(rssSourceId)) {
+                if (rssSource.getFeed() == null && rssSource.getFeed().getChannel() == null) {
+                    return null;
+                }
+
+                for (Item item : rssSource.getFeed().getChannel().getItems()) {
+                    if (item.getId().equals(itemId)) {
+                        return item;
+                    }
+                }
             }
         }
 

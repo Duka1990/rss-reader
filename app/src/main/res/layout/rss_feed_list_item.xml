@@ -2,61 +2,61 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/rss_feed_list_item_height"
+    android:layout_height="@dimen/rssFeedList_item_height"
     android:orientation="vertical"
     android:background="?android:attr/selectableItemBackground">
 
     <TextView
-        android:id="@+id/rss_feed_list_item_menu"
-        android:layout_width="@dimen/rss_source_list_item_menu_width"
-        android:layout_height="@dimen/rss_source_list_item_menu_height"
-        android:layout_marginEnd="@dimen/rss_source_list_item_menu_marginEnd"
+        android:id="@+id/rssFeedList_item_menu"
+        android:layout_width="@dimen/rssFeedList_item_menu_width"
+        android:layout_height="@dimen/rssFeedList_item_menu_height"
+        android:layout_marginEnd="@dimen/rssFeedList_item_menu_marginEnd"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:gravity="center"
-        android:text="@string/rss_feed_list_item_menu"
+        android:text="@string/rssFeedList_item_menu"
         android:textAppearance="?android:textAppearanceLarge" />
 
     <ImageView
-        android:id="@+id/rss_feed_list_item_image"
+        android:id="@+id/rssFeedList_item_image"
         android:layout_width="42dp"
         android:layout_height="42dp"
-        android:layout_marginTop="@dimen/rss_feed_list_item_image_marginTop"
-        android:layout_marginStart="@dimen/rss_feed_list_item_image_marginStart"
+        android:layout_marginTop="@dimen/rssFeedList_item_image_marginTop"
+        android:layout_marginStart="@dimen/rssFeedList_item_image_marginStart"
         android:contentDescription="@string/imageView_defaultContentDescription"/>
 
     <TextView
-        android:id="@+id/rss_feed_list_item_title"
+        android:id="@+id/rssFeedList_item_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/rss_feed_list_item_title_paddingTop"
-        android:paddingStart="@dimen/rss_feed_list_item_title_paddingStart"
-        android:paddingEnd="@dimen/rss_feed_list_item_title_paddingEnd"
-        android:layout_toStartOf="@id/rss_feed_list_item_menu"
+        android:paddingTop="@dimen/rssFeedList_item_title_paddingTop"
+        android:paddingStart="@dimen/rssFeedList_item_title_paddingStart"
+        android:paddingEnd="@dimen/rssFeedList_item_title_paddingEnd"
+        android:layout_toStartOf="@id/rssFeedList_item_menu"
         android:maxLines="1"
         android:ellipsize="end"
         android:textAppearance="?android:textAppearanceListItem"/>
 
     <TextView
-        android:id="@+id/rss_feed_list_item_description"
+        android:id="@+id/rssFeedList_item_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/rss_feed_list_item_description_paddingStart"
-        android:paddingEnd="@dimen/rss_feed_list_item_description_paddingEnd"
-        android:layout_below="@id/rss_feed_list_item_title"
-        android:layout_toStartOf="@id/rss_feed_list_item_menu"
+        android:paddingStart="@dimen/rssFeedList_item_description_paddingStart"
+        android:paddingEnd="@dimen/rssFeedList_item_description_paddingEnd"
+        android:layout_below="@id/rssFeedList_item_title"
+        android:layout_toStartOf="@id/rssFeedList_item_menu"
         android:maxLines="1"
         android:ellipsize="end"
         android:textAppearance="?android:textAppearanceListItemSecondary"/>
 
     <TextView
-        android:id="@+id/rss_feed_list_item_pubDate"
+        android:id="@+id/rssFeedList_item_pubDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/rss_feed_list_item_description_paddingStart"
-        android:paddingEnd="@dimen/rss_feed_list_item_description_paddingEnd"
-        android:layout_below="@id/rss_feed_list_item_description"
-        android:layout_toStartOf="@id/rss_feed_list_item_menu"
+        android:paddingStart="@dimen/rssFeedList_item_description_paddingStart"
+        android:paddingEnd="@dimen/rssFeedList_item_description_paddingEnd"
+        android:layout_below="@id/rssFeedList_item_description"
+        android:layout_toStartOf="@id/rssFeedList_item_menu"
         android:maxLines="1"
         android:ellipsize="end"
         android:textAppearance="?android:textAppearanceListItemSecondary"/>

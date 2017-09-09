@@ -13,21 +13,18 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import hu.possible.demo.rssreader.R;
 import hu.possible.demo.rssreader.adapters.viewholders.RssFeedListViewHolder;
+import hu.possible.demo.rssreader.models.ContentOrderMode;
 import hu.possible.demo.rssreader.models.Item;
 import hu.possible.demo.rssreader.utils.ModelHelpers;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
-import timber.log.Timber;
 
 public class RssFeedListAdapter extends RecyclerView.Adapter<ViewHolder> {
 
@@ -37,9 +34,13 @@ public class RssFeedListAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     private Context mContext;
 
+    private List<Item> mUnorderedItems = new ArrayList<>();
     private List<Item> mItems = new ArrayList<>();
 
+    private ContentOrderMode mContentOrderMode = ContentOrderMode.DEFAULT;
+
     private final PublishSubject<Item> mOnClickSubject = PublishSubject.create();
+    private final PublishSubject<Item> mOnShareSubject = PublishSubject.create();
     private final PublishSubject<Item> mOnRemoveSubject = PublishSubject.create();
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,25 +89,9 @@ public class RssFeedListAdapter extends RecyclerView.Adapter<ViewHolder> {
         Item item = getItemForPosition(position);
         RssFeedListViewHolder rssFeedListViewHolder = (RssFeedListViewHolder) holder;
 
-        rssFeedListViewHolder.getTitle().setText(item.getTitle());
-        rssFeedListViewHolder.getDescription().setText(item.getDescription());
-
-        if (!TextUtils.isEmpty(item.getPubDate())) {
-            DateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH);
-
-            try {
-                Date date = dateFormat.parse(item.getPubDate());
-                SimpleDateFormat displayedDateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss", Locale.ENGLISH);
-
-                rssFeedListViewHolder.getPublicationDate().setText(displayedDateFormat.format(date));
-            } catch (ParseException e) {
-                Timber.d(e);
-
-                rssFeedListViewHolder.getPublicationDate().setText(item.getPubDate());
-            }
-        } else {
-            rssFeedListViewHolder.getPublicationDate().setText(null);
-        }
+        rssFeedListViewHolder.getTitle().setText(ModelHelpers.resolveTitleFromItem(item));
+        rssFeedListViewHolder.getDescription().setText(ModelHelpers.resolveDescriptionFromItem(item));
+        rssFeedListViewHolder.getPublicationDate().setText(ModelHelpers.resolveFormattedPublicationDateFromItem(item));
 
         String imageUrl = ModelHelpers.resolveImageUrlFromItem(item);
 
@@ -139,7 +124,10 @@ public class RssFeedListAdapter extends RecyclerView.Adapter<ViewHolder> {
         popup.getMenuInflater().inflate(R.menu.rss_feed_list_item_actions, popup.getMenu());
         popup.setOnMenuItemClickListener(menuItem -> {
             switch (menuItem.getItemId()) {
-                case R.id.rss_feed_list_item_remove:
+                case R.id.rssFeedList_item_share:
+                    mOnShareSubject.onNext(item);
+                    break;
+                case R.id.rssFeedList_item_remove:
                     mOnRemoveSubject.onNext(item);
                     break;
                 default:
@@ -156,37 +144,79 @@ public class RssFeedListAdapter extends RecyclerView.Adapter<ViewHolder> {
     /// HELPER METHODS
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    public Observable<Item> getOnClickObservable(){
+        return mOnClickSubject;
+    }
+
+    public Observable<Item> getOnShareObservable(){
+        return mOnShareSubject;
+    }
+
+    public Observable<Item> getOnRemoveObservable(){
+        return mOnRemoveSubject;
+    }
+
     private Item getItemForPosition(int position) {
         return mItems.get(position);
     }
 
     public void addItems(List<Item> items) {
+        clearItemsIfAny();
+        mUnorderedItems.addAll(items);
         mItems.addAll(items);
+
+        if (mContentOrderMode != ContentOrderMode.DEFAULT) {
+            orderItems(mContentOrderMode);
+        }
     }
 
     public void clearItemsIfAny() {
-        if (isEmpty()) {
+        if (mItems.isEmpty()) {
             return;
         }
 
+        mUnorderedItems.clear();
         mItems.clear();
     }
 
-    public void replaceItems(List<Item> items) {
-        clearItemsIfAny();
-        addItems(items);
+    public void orderItems(ContentOrderMode contentOrderMode) {
+        mContentOrderMode = contentOrderMode;
+
+        switch (contentOrderMode) {
+            case ORDER_BY_TITLE_ASC:
+                throw new UnsupportedOperationException();
+            case ORDER_BY_TITLE_DESC:
+                throw new UnsupportedOperationException();
+            case ORDER_BY_PUB_DATE_ASC:
+                orderItemsByPubDate(false);
+                break;
+            case ORDER_BY_PUB_DATE_DESC:
+                orderItemsByPubDate(true);
+                break;
+            case DEFAULT:
+                mItems.clear();
+                mItems.addAll(mUnorderedItems);
+                break;
+            default:
+                break;
+        }
     }
 
-    public boolean isEmpty() {
-        return mItems.isEmpty();
-    }
+    private void orderItemsByPubDate(boolean ascending) {
+        Collections.sort(mItems, (first, second) -> {
+            Date firstPubDate = ModelHelpers.resolvePublicationDateFromItem(first);
+            Date secondPubDate = ModelHelpers.resolvePublicationDateFromItem(second);
 
-    public Observable<Item> getOnClickObservable(){
-        return mOnClickSubject;
-    }
+            if (firstPubDate == null || secondPubDate == null) {
+                return 0;
+            }
 
-    public Observable<Item> getOnRemoveObservable(){
-        return mOnRemoveSubject;
+            if (ascending) {
+                return firstPubDate.compareTo(secondPubDate);
+            } else {
+                return secondPubDate.compareTo(firstPubDate);
+            }
+        });
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

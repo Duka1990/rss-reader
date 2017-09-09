@@ -19,23 +19,23 @@ public class RssFeedListViewHolder extends ViewHolder {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Getter
-    @BindView(R.id.rss_feed_list_item_image)
+    @BindView(R.id.rssFeedList_item_image)
     ImageView mImage;
 
     @Getter
-    @BindView(R.id.rss_feed_list_item_title)
+    @BindView(R.id.rssFeedList_item_title)
     TextView mTitle;
 
     @Getter
-    @BindView(R.id.rss_feed_list_item_description)
+    @BindView(R.id.rssFeedList_item_description)
     TextView mDescription;
 
     @Getter
-    @BindView(R.id.rss_feed_list_item_pubDate)
+    @BindView(R.id.rssFeedList_item_pubDate)
     TextView mPublicationDate;
 
     @Getter
-    @BindView(R.id.rss_feed_list_item_menu)
+    @BindView(R.id.rssFeedList_item_menu)
     TextView mMenu;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -8,8 +8,8 @@
         android:id="@+id/dialog_addRssSource_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/rss_source_list_item_description_paddingStart"
-        android:layout_marginEnd="@dimen/rss_source_list_item_description_paddingEnd"
+        android:layout_marginStart="@dimen/dialog_addRssSource_input_paddingStart"
+        android:layout_marginEnd="@dimen/dialog_addRssSource_input_paddingEnd"
         android:inputType="textWebEmailAddress"/>
 
 </LinearLayout>
