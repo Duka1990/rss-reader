@@ -1,1 +1,1 @@
-include ':rss-reader'
+include ':app'
