@@ -1,5 +1,6 @@
 package hu.possible.demo.rssreader.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -91,6 +92,33 @@ public class MainActivity extends AbstractActivity {
                         Snackbar
                                 .make(getRootContentView(), rssSource.getUrl(), Snackbar.LENGTH_SHORT)
                                 .show();
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+
+        mRssSourceListAdapter.getOnShareObservable()
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<RssSource>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                    }
+
+                    @Override
+                    public void onNext(@NonNull RssSource rssSource) {
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+
+                        shareIntent.putExtra(Intent.EXTRA_SUBJECT, rssSource.resolveTitle());
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, rssSource.getUrl());
+                        shareIntent.setType("text/plain");
+
+                        startActivity(Intent.createChooser(shareIntent, getString(R.string.dialog_shareRssSource_title)));
                     }
 
                     @Override
@@ -195,27 +223,27 @@ public class MainActivity extends AbstractActivity {
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_add_rss_source, null);
 
-        final EditText editText = dialogView.findViewById(R.id.dialog_add_rss_source_input);
+        final EditText editText = dialogView.findViewById(R.id.dialog_addRssSource_input);
 
         dialogBuilder.setView(dialogView);
-        dialogBuilder.setTitle(R.string.dialog_add_rss_source_title);
-        dialogBuilder.setPositiveButton(R.string.dialog_add_rss_source_add, (dialog, whichButton) -> {
+        dialogBuilder.setTitle(R.string.dialog_addRssSource_title);
+        dialogBuilder.setPositiveButton(R.string.dialog_addRssSource_add, (dialog, whichButton) -> {
             String input = editText.getText().toString();
 
             if (TextUtils.isEmpty(input)) {
                 Snackbar
-                        .make(getRootContentView(), R.string.dialog_add_rss_source_empty, Snackbar.LENGTH_SHORT)
+                        .make(getRootContentView(), R.string.dialog_addRssSource_empty, Snackbar.LENGTH_SHORT)
                         .show();
             } else if (!StringUtils.isValidUrl(input)) {
                 Snackbar
-                        .make(getRootContentView(), R.string.dialog_add_rss_source_invalid_url, Snackbar.LENGTH_SHORT)
+                        .make(getRootContentView(), R.string.dialog_addRssSource_invalid_url, Snackbar.LENGTH_SHORT)
                         .show();
             } else {
                 mContentManager.addNewRssSource(input);
             }
         });
 
-        dialogBuilder.setNegativeButton(R.string.dialog_add_rss_source_cancel, (dialog, whichButton) -> {
+        dialogBuilder.setNegativeButton(R.string.dialog_addRssSource_cancel, (dialog, whichButton) -> {
         });
 
         AlertDialog alertDialog = dialogBuilder.create();

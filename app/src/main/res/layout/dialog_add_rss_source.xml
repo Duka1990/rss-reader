@@ -5,7 +5,7 @@
     android:orientation="vertical">
 
     <EditText
-        android:id="@+id/dialog_add_rss_source_input"
+        android:id="@+id/dialog_addRssSource_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/rss_source_list_item_description_paddingStart"

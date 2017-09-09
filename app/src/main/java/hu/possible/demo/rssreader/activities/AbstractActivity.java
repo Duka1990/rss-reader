@@ -64,26 +64,26 @@ public abstract class AbstractActivity extends AppCompatActivity {
 
         injectActivity();
 
-        initializeDisposables();
-
         mContentManager.initializeRssSources();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        initializeDisposables();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+
+        clearDisposables();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        clearDisposables();
     }
 
     @Override

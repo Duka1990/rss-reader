@@ -28,6 +28,7 @@ public class RssSourceListAdapter extends RecyclerView.Adapter<ViewHolder> {
     private List<RssSource> mItems = new ArrayList<>();
 
     private final PublishSubject<RssSource> mOnClickSubject = PublishSubject.create();
+    private final PublishSubject<RssSource> mOnShareSubject = PublishSubject.create();
     private final PublishSubject<RssSource> mOnRemoveSubject = PublishSubject.create();
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,13 +77,8 @@ public class RssSourceListAdapter extends RecyclerView.Adapter<ViewHolder> {
         RssSource item = getItemForPosition(position);
         RssSourceListViewHolder rssSourceListViewHolder = (RssSourceListViewHolder) holder;
 
-        if (item.getRssFeed() != null && item.getRssFeed().getChannel() != null) {
-            rssSourceListViewHolder.getTitle().setText(item.getRssFeed().getChannel().getTitle());
-            rssSourceListViewHolder.getDescription().setText(item.getRssFeed().getChannel().getDescription());
-        } else {
-            rssSourceListViewHolder.getTitle().setText(item.getUrl());
-        }
-
+        rssSourceListViewHolder.getTitle().setText(item.resolveTitle());
+        rssSourceListViewHolder.getDescription().setText(item.resolveDescription());
         rssSourceListViewHolder.getMenu().setTag(item);
         rssSourceListViewHolder.getMenu().setOnClickListener(view -> openOptionMenu(view, (RssSource) view.getTag()));
 
@@ -99,6 +95,9 @@ public class RssSourceListAdapter extends RecyclerView.Adapter<ViewHolder> {
         popup.getMenuInflater().inflate(R.menu.rss_source_list_item_actions, popup.getMenu());
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
+                case R.id.rss_source_list_item_share:
+                    mOnShareSubject.onNext(rssSource);
+                    break;
                 case R.id.rss_source_list_item_remove:
                     mOnRemoveSubject.onNext(rssSource);
                     break;
@@ -143,6 +142,10 @@ public class RssSourceListAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     public Observable<RssSource> getOnClickObservable(){
         return mOnClickSubject;
+    }
+
+    public Observable<RssSource> getOnShareObservable(){
+        return mOnShareSubject;
     }
 
     public Observable<RssSource> getOnRemoveObservable(){

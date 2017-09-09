@@ -21,7 +21,7 @@ android {
     buildToolsVersion "25.0.2"
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 22
         targetSdkVersion 26
 
         applicationId "hu.possible.demo.rssreader"

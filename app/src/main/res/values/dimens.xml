@@ -15,7 +15,7 @@
     <dimen name="rss_source_list_item_menu_height">32dp</dimen>
     <dimen name="rss_source_list_item_menu_marginEnd">16dp</dimen>
 
-    <dimen name="dialog_add_rss_source_input_paddingStart">24dp</dimen>
-    <dimen name="dialog_add_rss_source_input_paddingEnd">24dp</dimen>
+    <dimen name="dialog_addRssSource_input_paddingStart">24dp</dimen>
+    <dimen name="dialog_addRssSource_input_paddingEnd">24dp</dimen>
 
 </resources>
