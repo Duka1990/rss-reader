@@ -1,0 +1,21 @@
+<resources>
+
+    <dimen name="rss_source_list_recyclerView_spacing">0dp</dimen>
+    <dimen name="rss_source_list_recyclerView_firstRowSpacing">8dp</dimen>
+    <dimen name="rss_source_list_recyclerView_lastRowSpacing">8dp</dimen>
+
+    <dimen name="rss_source_list_item_title_paddingTop">20dp</dimen>
+    <dimen name="rss_source_list_item_title_paddingStart">16dp</dimen>
+    <dimen name="rss_source_list_item_title_paddingEnd">16dp</dimen>
+
+    <dimen name="rss_source_list_item_description_paddingStart">16dp</dimen>
+    <dimen name="rss_source_list_item_description_paddingEnd">16dp</dimen>
+
+    <dimen name="rss_source_list_item_menu_width">32dp</dimen>
+    <dimen name="rss_source_list_item_menu_height">32dp</dimen>
+    <dimen name="rss_source_list_item_menu_marginEnd">16dp</dimen>
+
+    <dimen name="dialog_add_rss_source_input_paddingStart">24dp</dimen>
+    <dimen name="dialog_add_rss_source_input_paddingEnd">24dp</dimen>
+
+</resources>

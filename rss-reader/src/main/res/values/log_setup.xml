@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="log_tag" translatable="false">RSS_READER_LOG</string>
+
+    <string name="log_http_tag" translatable="false">RSS_READER_HTTP_LOG</string>
+</resources>

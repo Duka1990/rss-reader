@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">RSSReader</string>
+
+    <string name="toolbar_action_add">Add</string>
+    <string name="toolbar_action_refresh">Refresh</string>
+    <string name="toolbar_action_sort">Sort</string>
+
+    <string name="rss_source_list_item_menu">&#8942;</string>
+    <string name="rss_source_list_item_action_remove">Remove</string>
+
+    <string name="dialog_add_rss_source_title">Add RSS source</string>
+    <string name="dialog_add_rss_source_add">Add</string>
+    <string name="dialog_add_rss_source_cancel">Cancel</string>
+    <string name="dialog_add_rss_source_empty">Empty input</string>
+    <string name="dialog_add_rss_source_invalid_url">Invalid RSS source</string>
+</resources>
