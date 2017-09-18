@@ -205,61 +205,35 @@ public class ContentManager {
                 });
     }
 
-    public void loadFeedInRssSource(String rssSourceId, boolean forceReload) {
+    public void loadFeedInRssSource(RssSource rssSource, boolean forceReload) {
         mContentStatusSubject.onNext(ContentState.LOADING);
 
-        mDatabaseManager.getRssSource(rssSourceId)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<RssSource>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-                        Timber.d("getRssSource -> onSubscribe");
-                    }
-
-                    @Override
-                    public void onNext(@NonNull RssSource rssSource) {
-                        Timber.d("getRssSource -> onNext");
-
-                        if (forceReload || rssSource.getFeed() == null) {
-                            mRssReaderClient.getFeed(rssSource.getUrl())
-                                    .subscribeOn(Schedulers.newThread())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(new Observer<Feed>() {
-                                        @Override
-                                        public void onSubscribe(@NonNull Disposable d) {
-                                        }
-
-                                        @Override
-                                        public void onNext(@NonNull Feed feed) {
-                                            addFeedToRssSource(rssSourceId, feed);
-                                        }
-
-                                        @Override
-                                        public void onError(@NonNull Throwable e) {
-                                            mContentStatusSubject.onNext(ContentState.ERROR);
-                                        }
-
-                                        @Override
-                                        public void onComplete() {
-                                        }
-                                    });
-                        } else {
-                            mContentStatusSubject.onNext(ContentState.READY);
+        if (forceReload || rssSource.getFeed() == null) {
+            mRssReaderClient.getFeed(rssSource.getUrl())
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<Feed>() {
+                        @Override
+                        public void onSubscribe(@NonNull Disposable d) {
                         }
-                    }
 
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        Timber.d("getRssSource -> onError");
+                        @Override
+                        public void onNext(@NonNull Feed feed) {
+                            addFeedToRssSource(rssSource.getId(), feed);
+                        }
 
-                        mContentStatusSubject.onNext(ContentState.ERROR);
-                    }
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            mContentStatusSubject.onNext(ContentState.ERROR);
+                        }
 
-                    @Override
-                    public void onComplete() {
-                        Timber.d("getRssSource -> onComplete");
-                    }
-                });
+                        @Override
+                        public void onComplete() {
+                        }
+                    });
+        } else {
+            mContentStatusSubject.onNext(ContentState.READY);
+        }
     }
 
     private void addFeedToRssSource(String rssSourceId, Feed feed) {

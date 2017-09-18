@@ -151,34 +151,6 @@ public class DatabaseManager {
                     }
                 });
     }
-
-    Observable<RssSource> getRssSource(String rssResouceId) {
-        return Observable
-                .create(emitter -> {
-                    try {
-                        final RealmResults<RssSource> rssSources =
-                                mRealm
-                                        .where(RssSource.class)
-                                        .equalTo("mId", rssResouceId)
-                                        .findAll();
-
-                        if (rssSources.size() == 0) {
-                            Timber.d("getRssSource error, NOT FOUND");
-
-                            emitter.onError(new NotFoundException());
-                        } else {
-                            Timber.d("getRssSource success, FOUND");
-
-                            emitter.onNext(rssSources.get(0));
-                            emitter.onComplete();
-                        }
-                    } catch (Exception e) {
-                        Timber.e(e, "getRssSource error");
-
-                        emitter.onError(e);
-                    }
-                });
-    }
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// DATABASE OPERATIONS / SELECT - - END

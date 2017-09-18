@@ -173,7 +173,10 @@ public class FeedActivity extends AbstractActivity {
         mRecyclerView.setVisibility(View.GONE);
         mProgressBar.setVisibility(View.VISIBLE);
 
-        mContentManager.loadFeedInRssSource(mRssSourceId, false);
+        // With the current functionality only existing rss sources can be opened in this Activity.
+        // Therefore mContentManager.getRssSource(...) cannot return null here.
+        mRssSource = mContentManager.getRssSource(mRssSourceId);
+        mContentManager.loadFeedInRssSource(mRssSource, false);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -239,7 +242,7 @@ public class FeedActivity extends AbstractActivity {
 
     @Override
     protected void onRefreshSelected() {
-        mContentManager.loadFeedInRssSource(mRssSourceId, true);
+        mContentManager.loadFeedInRssSource(mRssSource, true);
     }
 
     @Override
